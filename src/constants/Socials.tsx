@@ -10,6 +10,10 @@ export const socials = [
         url: '#'
     },
     {
+        icon: <LinkedInIcon />,
+        url: '#'
+    },
+    {
         icon: <InstagramIcon />,
         url: '#'
     },
