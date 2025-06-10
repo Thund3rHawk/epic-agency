@@ -47,17 +47,102 @@ const AboutSection = () => {
       });
 
       // Optionally, you can pin the keywords in place
-      gsap.to(keywordEls, {
-        y: 0,
-        opacity: 1,
-        rotation: 0,
-        scrollTrigger: {
-          trigger: headlineRef.current,
-          scrub: true,
-          start: "top center",
-          end: "bottom center",
-        },
-      });
+    gsap.to(keywordEls, {
+      y: 0,
+      opacity: 1,
+      rotation: 0,
+      scrollTrigger: {
+        trigger: headlineRef.current,
+        scrub: true,
+        start: "top center",
+        end: "bottom center",
+      },
+    });
+
+    // After non-keywords are gone, move keywords to same line and new positions
+    ScrollTrigger.create({
+      trigger: headlineRef.current,
+      start: "bottom center",
+      onEnter: () => {
+        // Calculate target X positions for the three words
+        // "imagine" to left, "build" stays, "tell" to right
+        const [imagineEl, buildEl, tellEl] = [
+          keywordEls.find((el) =>
+            el.textContent?.toLowerCase().includes("imagine")
+          ),
+          keywordEls.find((el) =>
+            el.textContent?.toLowerCase().includes("build")
+          ),
+          keywordEls.find((el) =>
+            el.textContent?.toLowerCase().includes("tell")
+          ),
+        ];
+
+        if (imagineEl && buildEl && tellEl) {
+          // Get the vertical center of the "build" word
+          const buildRect = buildEl.getBoundingClientRect();
+          const buildCenterY = buildRect.top + buildRect.height / 2;
+
+          // Helper to get the vertical center of an element
+          const getCenterY = (el: Element) => {
+            const rect = el.getBoundingClientRect();
+            return rect.top + rect.height / 2;
+          };
+
+          // Move all keywords to the same vertical position as "build"
+          [imagineEl, buildEl, tellEl].forEach((el) => {
+            const deltaY = buildCenterY - getCenterY(el);
+            gsap.to(el, {
+              y: `+=${deltaY}`,
+              duration: 0.8,
+              ease: "power2.inOut",
+            });
+          });
+
+          // Move imagine to left, build stays, tell to right
+          gsap.to(imagineEl, {
+            x: -420,
+            duration: 0.8,
+            ease: "power2.inOut",
+          });
+          gsap.to(buildEl, {
+            x: -150,
+            duration: 0.8,
+            ease: "power2.inOut",
+          });
+          gsap.to(tellEl, {
+            x: 150,
+            duration: 0.8,
+            ease: "power2.inOut",
+          });
+        }
+      },
+      onLeaveBack: () => {
+        // Reset the transforms for all keywords
+        const [imagineEl, buildEl, tellEl] = [
+          keywordEls.find((el) =>
+            el.textContent?.toLowerCase().includes("imagine")
+          ),
+          keywordEls.find((el) =>
+            el.textContent?.toLowerCase().includes("build")
+          ),
+          keywordEls.find((el) =>
+            el.textContent?.toLowerCase().includes("tell")
+          ),
+        ];
+
+        [imagineEl, buildEl, tellEl].forEach((el) => {
+          if (el) {
+            gsap.to(el, {
+              x: 0,
+              y: 0,
+              duration: 0.8,
+              ease: "power2.inOut",
+            });
+          }
+        });
+      },
+    });
     }
   }, []);
 
