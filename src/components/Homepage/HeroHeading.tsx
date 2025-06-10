@@ -8,6 +8,7 @@ const HeroHeading = () => {
     const headlineRef = useRef<HTMLHeadingElement>(null);
 
     gsap.registerPlugin(SplitText);
+
     useGSAP(() => {
         gsap.set(".split", { opacity: 1 });
 
@@ -22,6 +23,12 @@ const HeroHeading = () => {
             stagger: 0.05,
             duration: 1,
             ease: "back",
+            scrollTrigger: {
+                trigger: headlineRef.current,
+                start: "top 80%",
+                toggleActions: "play none none none",
+                once: true,
+            },
         });
     }, []);
 
