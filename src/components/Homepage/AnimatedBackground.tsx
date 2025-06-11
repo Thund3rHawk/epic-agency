@@ -4,23 +4,46 @@ import { gsap } from "gsap";
 import HeroHeading from "./HeroHeading";
 import JournalCard from "./JournalCard";
 import { backgrounds } from "@/constants/Backgrounds";
-
-
+import useColorCtx from "@/hooks/useColorCtx";
 
 const AnimatedBackground: React.FC = () => {
   const [bgIndex, setBgIndex] = useState(0);
   const [nextBgIndex, setNextBgIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const bgRef = useRef<HTMLDivElement>(null);
+  const { setColor } = useColorCtx();
 
   // Animate out, then change image, then animate in
+  const [isInView, setIsInView] = useState(true);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    const handleVisibility = (entries: IntersectionObserverEntry[]) => {
+      setIsInView(entries[0].isIntersecting);
+    };
+
+    if (bgRef.current) {
+      observerRef.current = new window.IntersectionObserver(handleVisibility, {
+        threshold: 0.1,
+      });
+      observerRef.current.observe(bgRef.current);
+    }
+
+    return () => {
+      if (observerRef.current && bgRef.current) {
+        observerRef.current.unobserve(bgRef.current);
+      }
+    };
+  }, []);
+
   useGSAP(() => {
     let timeout: NodeJS.Timeout;
+
+    if (!isInView) return; // Pause animation if not in view
 
     if (!isTransitioning) {
       timeout = setTimeout(() => {
         const nextIndex = (bgIndex + 1) % backgrounds.length;
-        // Only preload and transition if the next image is different
         if (backgrounds[nextIndex].image !== backgrounds[bgIndex].image) {
           const nextImg = new window.Image();
           nextImg.src = backgrounds[nextIndex].image;
@@ -31,9 +54,7 @@ const AnimatedBackground: React.FC = () => {
         }
       }, 3000);
     } else {
-      // Animate out
       if (bgRef.current) {
-        // Animate out: move to top right and fade out
         gsap.to(bgRef.current, {
           scale: 0.4,
           rotateY: 90,
@@ -44,13 +65,11 @@ const AnimatedBackground: React.FC = () => {
           duration: 0.7,
           ease: "power2.in",
           onComplete: () => {
-            // Change background index
             if (backgrounds[bgIndex].image !== backgrounds[nextBgIndex].image) {
               setBgIndex(nextBgIndex);
             }
             setTimeout(() => {
               if (bgRef.current) {
-                // Instantly reset to center, small, invisible
                 gsap.set(bgRef.current, {
                   scale: 0.4,
                   rotateY: 90,
@@ -59,7 +78,6 @@ const AnimatedBackground: React.FC = () => {
                   x: 0,
                   y: 0,
                 });
-                // Animate in: grow and fade in from center
                 gsap.to(bgRef.current, {
                   scale: 1,
                   rotateY: 0,
@@ -85,15 +103,20 @@ const AnimatedBackground: React.FC = () => {
     return () => {
       clearTimeout(timeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTransitioning, bgIndex, nextBgIndex]);
+  }, [isTransitioning, bgIndex, nextBgIndex, isInView]);
 
   const bg = backgrounds[bgIndex];
+
+  useEffect(() => {
+    if (!isTransitioning) {
+      setColor(bg.color);
+    }
+  }, [bg.color, setColor, isTransitioning]);
 
   return (
     <div
       ref={bgRef}
-      className="absolute inset-0 -z-10 w-full h-full bg-cover bg-center"
+      className="absolute inset-0 z-10 w-full h-full bg-cover bg-center"
       style={{
         backgroundImage: `url(${bg.image})`,
         backgroundColor: bg.color,
