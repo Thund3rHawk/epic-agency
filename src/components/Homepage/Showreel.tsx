@@ -1,4 +1,5 @@
 'use client'
+import useColorCtx from '@/hooks/useColorCtx'
 import React, { useRef, useState } from 'react'
 
 const Showreel = () => {
@@ -36,8 +37,11 @@ const Showreel = () => {
             }
 
             const handleMouseLeave = () => setBtnPos({ x: 0, y: 0 })
+
+            const {textColor} = useColorCtx();
+
   return (
-    <div className='container mx-auto border-t border-b border-t-black border-b-black pb-20 pt-6'>
+    <div className='container mx-auto border-t border-b  pb-20 pt-6' style={{borderBottomColor: textColor, borderTopColor: textColor}}>
         <h1 className='uppercase text-center text-xs my-16'>showreel</h1>
           <div className="relative w-full flex justify-center">
             

@@ -8,9 +8,9 @@ import useColorCtx from '@/hooks/useColorCtx'
 import React from 'react'
 
 const Homepage = () => {
-  const {color} = useColorCtx();
+  const {color, textColor} = useColorCtx();
   return (
-    <div style={{ backgroundColor: color }}>
+    <div style={{ backgroundColor: color, color: textColor }}>
         <HeroSection/>
         <Showreel/>
         <AboutSection/>

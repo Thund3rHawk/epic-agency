@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useRef } from "react";
 import gsap from "gsap";
+import useColorCtx from "@/hooks/useColorCtx";
 
 const ServiceSection = () => {
   const [mouseEnter, setMouseEnter] = useState(false);
@@ -65,8 +66,11 @@ const ServiceSection = () => {
     setMagneticY(0);
     setMouseEnter(false);
   }
+
+  const {textColor} = useColorCtx();
+
   return (
-    <div className="container mx-auto border-t border-t-black py-20">
+    <div className="container mx-auto border-t py-20" style={{borderBottomColor: textColor}}>
       <motion.div
         style={{
           display: "flex",

@@ -11,7 +11,7 @@ const AnimatedBackground: React.FC = () => {
   const [nextBgIndex, setNextBgIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const bgRef = useRef<HTMLDivElement>(null);
-  const { setColor } = useColorCtx();
+  const { setColor, setTextColor } = useColorCtx();
 
   // Animate out, then change image, then animate in
   const [isInView, setIsInView] = useState(true);
@@ -71,10 +71,11 @@ const AnimatedBackground: React.FC = () => {
             setTimeout(() => {
               if (bgRef.current) {
                 gsap.set(bgRef.current, {
-                  scale: 0.4,
+                  scale: 0.2,
+                  duration: 0.3,
                   rotateY: 90,
                   rotateX: 40,
-                  opacity: 1,
+                  opacity: 0.9,
                   x: 0,
                   y: 0,
                 });
@@ -86,7 +87,7 @@ const AnimatedBackground: React.FC = () => {
                   x: 0,
                   y: 0,
                   duration: 1,
-                  ease: "power2.out",
+                  ease: "power2.in",
                   onComplete: () => {
                     setIsTransitioning(false);
                   },
@@ -94,7 +95,7 @@ const AnimatedBackground: React.FC = () => {
               } else {
                 setIsTransitioning(false);
               }
-            }, 100);
+            }, 1000);
           },
         });
       }
@@ -108,9 +109,10 @@ const AnimatedBackground: React.FC = () => {
   const bg = backgrounds[bgIndex];
 
   useEffect(() => {
-    if (!isTransitioning) {
-      setColor(bg.color);
-    }
+    setColor(bg.color);
+    setTextColor(bg.textColor)
+    // if (!isTransitioning) {
+    // }
   }, [bg.color, setColor, isTransitioning]);
 
   return (
@@ -119,7 +121,6 @@ const AnimatedBackground: React.FC = () => {
       className="absolute inset-0 z-10 w-full h-full bg-cover bg-center"
       style={{
         backgroundImage: `url(${bg.image})`,
-        backgroundColor: bg.color,
         transition: "background-image 1s ease-in-out",
       }}
       aria-hidden="true"
